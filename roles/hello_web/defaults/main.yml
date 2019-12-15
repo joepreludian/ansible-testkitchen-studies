@@ -1,0 +1,5 @@
+---
+hello_web:
+  docroot: /usr/share/nginx/html
+  package: nginx
+  service: nginx

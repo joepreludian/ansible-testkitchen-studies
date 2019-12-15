@@ -1,0 +1,40 @@
+---
+driver:
+  name: vagrant
+  network:
+    - ['forwarded_port', {guest: 80, host: 8080}]
+
+provisioner:
+  name: ansible_playbook
+  hosts: all
+  require_ansible_repo: true
+  require_ansible_omnibus: false
+  ansible_verbose: true
+  ansible_verbosity: 1
+  ansible_diff: true
+  roles_path: ../../roles
+  playbook: ../../playbook.yml
+  require_chef_for_busser: true
+
+verifier:
+  name: busser
+
+platforms:
+  - name: fedora/30-cloud-base
+    lifecycle:
+      pre_verify:
+        - remote: sudo dnf install -y python3-pip libxcrypt-compat
+        - remote: sudo pip install --upgrade pip testinfra setuptools==20.6.7
+        - remote: sudo ln -sf /usr/local/bin/pytest /usr/local/bin/testinfra
+    transport:
+      max_ssh_sessions: 6
+    provisioner:
+      extra_vars:
+        hello_web:
+          package: nginx
+          service: nginx
+          docroot: /usr/share/nginx/html
+
+
+suites:
+  - name: default
